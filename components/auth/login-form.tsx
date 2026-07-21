@@ -28,32 +28,35 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mx-auto flex w-full max-w-sm flex-col gap-4 rounded-lg border bg-white p-6 shadow-sm">
+    <form onSubmit={onSubmit} className="mx-auto flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
       <div>
-        <h2 className="text-xl font-semibold">Sign in</h2>
-        <p className="text-sm text-muted-foreground">Use your workspace credentials to continue.</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Sign in</p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-900">Welcome back</h2>
+        <p className="mt-2 text-sm text-slate-500">Use your workspace credentials to continue to the warehouse platform.</p>
       </div>
 
-      {error ? <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
 
-      <label className="flex flex-col gap-1 text-sm">
-        <span>Email</span>
+      <label className="flex flex-col gap-2 text-sm">
+        <span className="font-medium text-slate-700">Email</span>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border px-3 py-2"
+          className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none transition focus:border-slate-400 focus:bg-white"
+          placeholder="name@company.com"
           required
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        <span>Password</span>
+      <label className="flex flex-col gap-2 text-sm">
+        <span className="font-medium text-slate-700">Password</span>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border px-3 py-2"
+          className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none transition focus:border-slate-400 focus:bg-white"
+          placeholder="Enter your password"
           required
         />
       </label>
@@ -61,10 +64,14 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+        className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
       >
         {isSubmitting ? 'Signing in...' : 'Sign in'}
       </button>
+
+      <p className="text-center text-xs text-slate-500">
+        For authorized warehouse personnel only.
+      </p>
     </form>
   )
 }
