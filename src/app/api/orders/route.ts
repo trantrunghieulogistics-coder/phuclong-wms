@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
+
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  return createClient(supabaseUrl, supabaseServiceKey)
+}
 
 export async function GET(request: NextRequest) {
   try {
+    const supabaseAdmin = getSupabaseAdmin()
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
     const platform = searchParams.get('platform')
@@ -27,6 +34,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
     const { orders } = body
     const results = []
