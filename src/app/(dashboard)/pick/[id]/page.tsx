@@ -128,7 +128,7 @@ export default function PickDetailPage() {
     }
 
     if (matchedItem.quantity_picked >= matchedItem.quantity_needed) {
-      toast.info(`SKU ${sku} đã pick đủ`)
+      toast.success(`SKU ${sku} đã pick đủ`)
       return
     }
 
