@@ -10,7 +10,7 @@ import {
   QrCodeIcon,
   CheckCircleIcon,
   MapPinIcon,
-  PackageIcon
+  ArchiveBoxIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
@@ -226,7 +226,7 @@ export default function PickDetailPage() {
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <PackageIcon className="w-5 h-5 text-gray-500" />
+                      <ArchiveBoxIcon className="w-5 h-5 text-gray-500" />
                       <span className="font-bold text-lg">{item.sku}</span>
                       {isComplete && <CheckCircleIcon className="w-5 h-5 text-green-500" />}
                     </div>
