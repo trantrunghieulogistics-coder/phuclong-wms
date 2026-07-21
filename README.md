@@ -1,2 +1,0 @@
-# phuclong-wms
-Warehouse WMS
