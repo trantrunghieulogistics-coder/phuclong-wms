@@ -18,14 +18,9 @@ export async function GET(request: NextRequest) {
     if (platform) query = query.eq('platform', platform)
 
     const { data, error } = await query
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ data })
-
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -34,7 +29,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { orders } = body
-
     const results = []
 
     for (const orderData of orders) {
@@ -57,31 +51,20 @@ export async function POST(request: NextRequest) {
         .select()
         .single()
 
-      if (orderError) {
-        console.error('Error creating order:', orderError)
-        continue
-      }
+      if (orderError) { console.error('Error:', orderError); continue }
 
       if (orderData.items?.length > 0) {
-        await supabaseAdmin
-          .from('order_items')
-          .insert(
-            orderData.items.map((item: any) => ({
-              order_id: order.id,
-              sku: item.sku,
-              product_name: item.product_name,
-              quantity: item.quantity,
-              unit: item.unit,
-            }))
-          )
+        await supabaseAdmin.from('order_items').insert(
+          orderData.items.map((item: any) => ({
+            order_id: order.id, sku: item.sku, product_name: item.product_name,
+            quantity: item.quantity, unit: item.unit,
+          }))
+        )
       }
-
       results.push(order)
     }
-
     return NextResponse.json({ data: results }, { status: 201 })
-
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
