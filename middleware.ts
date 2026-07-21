@@ -19,7 +19,11 @@ export async function middleware(request: NextRequest) {
 
   if (isStaticAsset) return NextResponse.next()
 
-  const { supabaseResponse, user } = await updateSession(request)
+  const { supabaseResponse, user, isConfigured } = await updateSession(request)
+
+  if (!isConfigured) {
+    return supabaseResponse
+  }
 
   if (!user) {
     if (isPublicPath) return supabaseResponse
