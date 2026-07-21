@@ -67,8 +67,9 @@ class AuthService {
       .eq('user_id', userId).eq('status', 'active').is('deleted_at', null).single()
     if (!profile) return null
 
-    if (profile.locked_until && new Date(profile.locked_until) > new Date()) {
-      throw new Error(`Account locked until ${new Date(profile.locked_until).toLocaleString()}`)
+    const lockedUntil = (profile as { locked_until?: string | null } | null)?.locked_until
+    if (lockedUntil && new Date(lockedUntil) > new Date()) {
+      throw new Error(`Account locked until ${new Date(lockedUntil).toLocaleString()}`)
     }
 
     const { data: userRoles } = await supabase
@@ -81,7 +82,7 @@ class AuthService {
 
     const permissions = getPermissionsForRoles(roles)
 
-    await supabase.from('profiles')
+    await (supabase as any).from('profiles')
       .update({ last_login_at: new Date().toISOString(), failed_login_count: 0 })
       .eq('user_id', userId)
 
@@ -91,7 +92,7 @@ class AuthService {
   private async logActivity(userId: string, actionType: string, module: string,
     referenceType?: string, referenceId?: string, description?: string) {
     const supabase = this.getClient()
-    await supabase.from('user_activity_log' as any).insert({
+    await (supabase as any).from('user_activity_log').insert({
       user_id: userId, action_type: actionType, module,
       reference_type: referenceType ?? null,
       reference_id: referenceId ?? null, description: description ?? null,
