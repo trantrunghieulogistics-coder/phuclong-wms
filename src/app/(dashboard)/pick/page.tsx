@@ -104,13 +104,13 @@ export default function PickListPage() {
       return
     }
 
-    const allItems = pendingOrders.flatMap(order => 
-      order.items.map((item: any) => ({
+    const allItems = pendingOrders.flatMap((order: any) => 
+      order.items?.map((item: any) => ({
         task_id: task.id,
         sku: item.sku,
         location: 'A-01-01',
         quantity_needed: item.quantity,
-      }))
+      })) || []
     )
 
     if (allItems.length > 0) {

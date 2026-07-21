@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Order } from '@/types'
 import { format } from 'date-fns'
@@ -8,31 +9,20 @@ import { vi } from 'date-fns/locale'
 import toast from 'react-hot-toast'
 
 export default function OrdersPage() {
+  const router = useRouter()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState({
-    status: '',
-    platform: '',
-  })
+  const [filter, setFilter] = useState({ status: '', platform: '' })
 
   useEffect(() => {
     fetchOrders()
-    
-    // Realtime subscription
     const subscription = supabase
       .channel('orders')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'orders' 
-      }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
         fetchOrders()
       })
       .subscribe()
-
-    return () => {
-      subscription.unsubscribe()
-    }
+    return () => { subscription.unsubscribe() }
   }, [filter])
 
   const fetchOrders = async () => {
@@ -47,7 +37,6 @@ export default function OrdersPage() {
     if (filter.platform) query = query.eq('platform', filter.platform)
 
     const { data, error } = await query
-
     if (error) {
       toast.error('Lỗi tải đơn hàng: ' + error.message)
     } else {
@@ -72,50 +61,23 @@ export default function OrdersPage() {
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      pending: 'Chờ xử lý',
-      picking: 'Đang pick',
-      packing: 'Đang pack',
-      ready_to_ship: 'Sẵn sàng giao',
-      shipped: 'Đã giao',
-      delivered: 'Đã nhận',
-      returned: 'Hoàn đơn',
-      cancelled: 'Đã hủy',
+      pending: 'Chờ xử lý', picking: 'Đang pick', packing: 'Đang pack',
+      ready_to_ship: 'Sẵn sàng giao', shipped: 'Đã giao',
+      delivered: 'Đã nhận', returned: 'Hoàn đơn', cancelled: 'Đã hủy',
     }
     return labels[status] || status
-  }
-
-  const createPickTask = async () => {
-    const pendingOrders = orders.filter(o => o.status === 'pending')
-    if (pendingOrders.length === 0) {
-      toast.error('Không có đơn chờ xử lý')
-      return
-    }
-
-    toast.success(`Đã tạo pick task cho ${pendingOrders.length} đơn`)
-    // API call to create pick task
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Quản lý đơn hàng</h1>
-        <div className="flex space-x-3">
-          <button
-            onClick={createPickTask}
-            className="btn-primary"
-          >
-            Tạo Pick Task
-          </button>
-          <button
-            onClick={() => {/* Import modal */}}
-            className="btn-secondary"
-          >
-            Nhập đơn
-          </button>
+        <div className="flex gap-2">
+          <button onClick={() => router.push('/pick')} className="btn-primary">Tạo Pick Task</button>
+          <button onClick={() => {}} className="btn-secondary">Nhập đơn</button>
         </div>
       </div>
 
-      {/* Filters */}
       <div className="card flex gap-4">
         <select
           value={filter.status}
@@ -127,7 +89,6 @@ export default function OrdersPage() {
           <option value="picking">Đang pick</option>
           <option value="packing">Đang pack</option>
           <option value="ready_to_ship">Sẵn sàng giao</option>
-          <option value="shipped">Đã giao</option>
         </select>
 
         <select
@@ -140,15 +101,9 @@ export default function OrdersPage() {
           <option value="tiktok">TikTok</option>
         </select>
 
-        <button
-          onClick={fetchOrders}
-          className="btn-secondary"
-        >
-          Làm mới
-        </button>
+        <button onClick={fetchOrders} className="btn-secondary">Làm mới</button>
       </div>
 
-      {/* Orders Table */}
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -165,31 +120,19 @@ export default function OrdersPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-phuc-long-green mx-auto"></div>
-                  </td>
-                </tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center">Đang tải...</td></tr>
               ) : orders.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                    Không có đơn hàng nào
-                  </td>
-                </tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">Không có đơn hàng</td></tr>
               ) : (
                 orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <div className="text-sm font-medium text-gray-900">{order.platform_order_id}</div>
-                      {order.so_code && (
-                        <div className="text-xs text-gray-500">{order.so_code}</div>
-                      )}
+                      {order.so_code && <div className="text-xs text-gray-500">{order.so_code}</div>}
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        order.platform === 'shopee' 
-                          ? 'bg-orange-100 text-orange-800' 
-                          : 'bg-gray-100 text-gray-800'
+                        order.platform === 'shopee' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'
                       }`}>
                         {order.platform === 'shopee' ? 'Shopee' : 'TikTok'}
                       </span>
@@ -198,17 +141,13 @@ export default function OrdersPage() {
                       <div className="text-sm text-gray-900">{order.customer_name || 'N/A'}</div>
                       <div className="text-xs text-gray-500">{order.customer_phone}</div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {order.items?.length || 0} items
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{order.items?.length || 0} items</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
                         {getStatusLabel(order.status)}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900 uppercase">
-                      {order.carrier || '-'}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900 uppercase">{order.carrier || '-'}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">
                       {order.created_at && format(new Date(order.created_at), 'HH:mm dd/MM', { locale: vi })}
                     </td>

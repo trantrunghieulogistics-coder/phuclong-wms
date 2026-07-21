@@ -10,8 +10,7 @@ import {
   QrCodeIcon,
   CheckCircleIcon,
   MapPinIcon,
-  PackageIcon,
-  ExclamationTriangleIcon
+  PackageIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
@@ -161,7 +160,6 @@ export default function PickDetailPage() {
         </div>
       </div>
 
-      {/* Progress bar */}
       <div className="card">
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-medium text-gray-700">Tiến độ</span>
@@ -175,7 +173,6 @@ export default function PickDetailPage() {
         </div>
       </div>
 
-      {/* Scanner */}
       {task.status === 'in_progress' && (
         <div className="card">
           <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -195,7 +192,6 @@ export default function PickDetailPage() {
             <div id="qr-reader" className="w-full"></div>
           )}
 
-          {/* Manual input fallback */}
           <div className="mt-4 flex gap-2">
             <input
               type="text"
@@ -215,7 +211,6 @@ export default function PickDetailPage() {
         </div>
       )}
 
-      {/* Items list */}
       <div className="card">
         <h3 className="font-semibold mb-4">Danh sách items ({items.length})</h3>
         <div className="space-y-3">
@@ -249,7 +244,6 @@ export default function PickDetailPage() {
                   </div>
                 </div>
 
-                {/* Manual adjust buttons */}
                 {task.status === 'in_progress' && !isComplete && (
                   <div className="mt-3 flex gap-2">
                     <button
@@ -272,7 +266,6 @@ export default function PickDetailPage() {
         </div>
       </div>
 
-      {/* Actions */}
       <div className="flex gap-4">
         {task.status === 'open' && (
           <button onClick={startPicking} className="flex-1 btn-primary py-3 text-lg">
